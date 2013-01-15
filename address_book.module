@@ -1,0 +1,149 @@
+<?php
+
+/**
+ * Implements hook_menu();
+ */
+function address_book_menu() {
+  $items['address_book']                              = array(
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('address_book_contact_adminform'),
+    'access arguments' => array('administer address book'),
+    'title'            => 'Address book',
+    'file'             => 'address_book.contact.admin.inc',
+  );
+  $items['address_book/list']                         = array(
+    'type'   => MENU_DEFAULT_LOCAL_TASK,
+    'title'  => 'List',
+    'weight' => -100500,
+  );
+  $items['address_book/add']                          = array(
+    'type'             => MENU_LOCAL_TASK,
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('address_book_contactform'),
+    'access arguments' => array('add contact to address book'),
+    'title'            => 'Add',
+    'file'             => 'address_book.contact.form.inc'
+  );
+  $items['address_book/add-contact']                  = array(
+    'type'             => MENU_LOCAL_ACTION,
+    'page callback'    => 'drupal_goto',
+    'page arguments'   => array('address_book/add'),
+    'access arguments' => array('add contact to address book'),
+    'title'            => 'Create new contact',
+    'file'             => 'address_book.contact.form.inc'
+  );
+  $items['address_book/%address_book_contact/edit']   = array(
+    'type'             => MENU_LOCAL_TASK,
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('address_book_contactform', 1),
+    'access arguments' => array('edit contacts in address book'),
+    'title'            => 'Edit',
+    'file'             => 'address_book.contact.form.inc',
+    'weight'           => 1,
+  );
+  $items['address_book/%address_book_contact/delete'] = array(
+    'type'             => MENU_LOCAL_TASK,
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('address_book_contact_deleteform', 1),
+    'access arguments' => array('remove contact from address book'),
+    'title'            => 'Delete',
+    'file'             => 'address_book.contact.delete.inc',
+    'weight'           => 2,
+  );
+  $items['address_book/%address_book_contact']        = array(
+    'page callback'    => 'address_book_contact_view',
+    'page arguments'   => array(1),
+    'access arguments' => array('view contact from address book'),
+    'title'            => 'View',
+    'file'             => 'address_book.contact.view.inc',
+  );
+  $items['address_book/%address_book_contact/view']   = array(
+    'type'   => MENU_DEFAULT_LOCAL_TASK,
+    'title'  => 'View',
+    'weight' => 0,
+  );
+
+
+  return $items;
+}
+
+function address_book_permission() {
+  return array(
+    'administer address book'          => array(
+      'title'       => t('Administer address book'),
+      'description' => t('Allow to use administration page'),
+    ),
+    'add contact to address book'      => array(
+      'title'       => t('Add contact to address book'),
+      'description' => t('Allow to add contact into address book'),
+    ),
+    'edit contacts in address book'    => array(
+      'title'       => t('Edit contact to address book'),
+      'description' => t('Allow to add contact into address book'),
+    ),
+    'remove contact from address book' => array(
+      'title'       => t('Remove contact from address book'),
+      'description' => t('Allow to remove contact from address book'),
+    ),
+    'view contact from address book'   => array(
+      'title'       => t('View contact from address book'),
+      'description' => t('Allow to view contact from address book'),
+    ),
+  );
+
+}
+
+/**
+ *  Gets a contact object from the database
+ */
+function address_book_contact_load($cid) {
+  $contact = db_select($table = 'edu_contacts', $alias = 'a')
+    ->fields('a')
+    ->condition('cid', $cid)
+    ->execute()
+    ->fetchObject();
+
+  return $contact;
+}
+
+function address_book_contact_delete_multiple($cids = array()) {
+  if (count($cids) > 0) {
+    foreach ($cids as $cid) {
+      $contact = address_book_contact_load($cid);
+
+      // delete contact
+      $delete_contact_query = db_delete('edu_contacts')
+        ->condition('cid', $contact->cid)
+        ->execute();
+
+      //delete photo
+      $photo = file_load($contact->photo);
+      file_delete($photo);
+    }
+    drupal_set_message(t('Selected contacts was deleted'));
+  }
+
+  if (count($cids) == 0) {
+    drupal_set_message(t('Nothing selected'));
+  }
+}
+
+/**
+ * Implements hook_install()
+ */
+function address_book_install() {
+
+  /**
+   * Create vocabulary for category
+   */
+  if (!taxonomy_vocabulary_machine_name_load('contact_categories')) {
+    $voc        = array(
+      'name'         => 'Contact categories',
+      'machine_name' => 'contact_categories',
+      'description'  => t('Contact categories list.'),
+      'module'       => 'taxonomy',
+    );
+    $vocabulary = (object) $voc;
+    taxonomy_vocabulary_save($vocabulary);
+  }
+}

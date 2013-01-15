@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * implements Hook_schema();
+ */
+function address_book_schema() {
+  $schema['edu_contacts'] = array(
+    'description' => 'address_book table',
+    'fields'      => array(
+      'cid'        => array(
+        'description' => 'The current contact identifier.',
+        'type'        => 'serial',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+      ),
+      'first_name' => array(
+        'description' => 'The current contact first name.',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => '',
+      ),
+      'last_name'  => array(
+        'description' => 'The current contact last name.',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => '',
+      ),
+      'birthday'    => array(
+        'description' => 'The current contact birthday.',
+        'type'        => 'varchar',
+        'length'      => 10,
+        'not null'    => TRUE,
+        'default'     => '',
+      ),
+      'email'      => array(
+        'description' => 'The current contact email.',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => '',
+      ),
+      'phone'      => array(
+        'description' => 'The current contact phone number.',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => '',
+      ),
+      'photo'      => array(
+        'description' => 'Contact photo file FID.',
+        'type'        => 'int',
+        'not null'    => TRUE,
+        'default'     => 0,
+      ),
+      'category'   => array(
+        'description' => 'Contact category tid.',
+        'type'        => 'int',
+        'not null'    => TRUE,
+        'default'     => 0,
+      ),
+      'comment'    => array(
+        'description' => 'The current contact comment.',
+        'type'        => 'varchar',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => '',
+      ),
+    ),
+    'primary key' => array('cid'),
+  );
+
+  return $schema;
+}
