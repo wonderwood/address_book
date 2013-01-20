@@ -82,7 +82,7 @@ function address_book_contact_adminform($form, $form_state) {
       'category'  => $category->name,
       'email'     => $row->email,
       'phone'     => $row->phone,
-      'birthday'  => $row->birthday,
+      'birthday'  => date("F j, Y", $row->birthday),
       'email'     => $row->email,
       'links'     => $view_link . ' | ' . $edit_link . ' | ' . $delete_link
     );

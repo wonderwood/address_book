@@ -1,7 +1,6 @@
 name = address_book
 description = address book custom module
 core = 7.x
-dependencies[] = date_api
 files[] = address_book.contact.add.inc
 files[] = address_book.contact.edit.inc
 files[] = address_book.contact.delete.inc

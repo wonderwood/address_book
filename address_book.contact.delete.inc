@@ -13,12 +13,12 @@ function address_book_contact_deleteform($form, $form_state, $contact) {
   if (isset($contact->cid) && !is_null($contact->cid)) {
     $title = t('Delete @first_name @last_name', array(
         '@first_name' => $contact->first_name,
-        '@last_name'  => $contact->last_name,
+        '@last_name' => $contact->last_name,
       )
     );
 
     drupal_set_title($title);
-    $breadcrumbs   = array();
+    $breadcrumbs = array();
     $breadcrumbs[] = l(t('Home'), url());
     $breadcrumbs[] = l(t('Address book'), 'address_book');
     $breadcrumbs[] = l($contact->first_name . ' ' . $contact->last_name, "address_book/$contact->cid");
@@ -27,8 +27,8 @@ function address_book_contact_deleteform($form, $form_state, $contact) {
     drupal_set_breadcrumb($breadcrumbs);
 
 
-    $form['cid']             = array(
-      '#type'  => 'hidden',
+    $form['cid'] = array(
+      '#type' => 'hidden',
       '#value' => $contact->cid,
     );
 
@@ -39,14 +39,14 @@ function address_book_contact_deleteform($form, $form_state, $contact) {
           '%last_name' => $contact->last_name,
         ))
     );
-      
+
     $form['warning_text'] = array(
-      '#type'   => 'item',
-      '#markup' => '<strong>'.t('This action can not be undone.').'</strong>',
+      '#type' => 'item',
+      '#markup' => '<strong>' . t('This action can not be undone.') . '</strong>',
     );
-    
-    $form['submit']          = array(
-      '#type'  => 'submit',
+
+    $form['submit'] = array(
+      '#type' => 'submit',
       '#value' => t('Yep, delete it.'),
     );
   }
@@ -75,7 +75,10 @@ function address_book_contact_deleteform_submit($form_id, $form_values) {
 
   //delete photo
   $photo = file_load($contact->photo);
-  file_delete($photo);
+  if ($photo) {
+    file_delete($photo);
+  }
+
 
   drupal_set_message(t('Contact deleted successful'));
   drupal_goto('address_book');
